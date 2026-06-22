@@ -81,6 +81,17 @@ export default function EbookDetailPage() {
     }
   }, [id, fetchEbookDetails, checkPurchaseStatus, checkBookmarkStatus]);
 
+  // Reset buying state if returning via browser back button (bfcache)
+  useEffect(() => {
+    const handlePageShow = (event) => {
+      if (event.persisted) {
+        setBuying(false);
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   const handleToggleBookmark = async () => {
     if (!isAuthenticated) {
       toast.error('Please login to bookmark ebooks');
@@ -113,6 +124,7 @@ export default function EbookDetailPage() {
       if (data.success && data.sessionUrl) {
         toast.loading('Redirecting to secure payment...', { duration: 2000 });
         window.location.href = data.sessionUrl;
+        setTimeout(() => setBuying(false), 2000);
       } else {
         toast.error('Failed to initiate checkout');
         setBuying(false);
