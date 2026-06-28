@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import EbookCard from '@/components/ebooks/EbookCard';
 import { FiSearch, FiSliders, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
@@ -108,14 +109,19 @@ export default function BrowsePage() {
     <div className="page-wrapper" style={{ padding: '3rem 0' }}>
       <div className="container">
         {/* Header */}
-        <div style={{ marginBottom: '2.5rem' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ marginBottom: '2.5rem' }}
+        >
           <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
             Browse <span className="text-gradient">Our Library</span>
           </h1>
           <p style={{ color: 'var(--text-secondary)' }}>
             Explore through {totalEbooks} original creations uploaded by emerging and established authors.
           </p>
-        </div>
+        </motion.div>
 
         {/* Filters and Main Grid */}
         <div style={{
@@ -289,8 +295,8 @@ export default function BrowsePage() {
             ) : ebooks.length > 0 ? (
               <>
                 <div className="grid-ebooks">
-                  {ebooks.map((ebook) => (
-                    <EbookCard key={ebook._id} ebook={ebook} />
+                  {ebooks.map((ebook, i) => (
+                    <EbookCard key={ebook._id} ebook={ebook} index={i} />
                   ))}
                 </div>
 
