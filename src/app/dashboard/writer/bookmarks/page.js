@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import EbookCard from '@/components/ebooks/EbookCard';
 import { FiBookmark } from 'react-icons/fi';
@@ -15,9 +16,7 @@ export default function WriterBookmarksPage() {
       try {
         const { data } = await api.get('/bookmarks');
         if (data.success) {
-          const books = data.bookmarks
-            .filter((b) => b.ebook)
-            .map((b) => b.ebook);
+          const books = data.bookmarks.filter((b) => b.ebook).map((b) => b.ebook);
           setBookmarkedBooks(books);
         }
       } catch (err) {
@@ -31,10 +30,17 @@ export default function WriterBookmarksPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: '2.5rem' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ marginBottom: '2.5rem' }}
+      >
         <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>My Bookmarked Stories</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Ebooks you have saved to read or reference later.</p>
-      </div>
+        <p style={{ color: 'var(--text-secondary)' }}>
+          {loading ? 'Loading…' : `${bookmarkedBooks.length} ebook${bookmarkedBooks.length !== 1 ? 's' : ''} saved to read or reference later`}
+        </p>
+      </motion.div>
 
       {loading ? (
         <div className="grid-ebooks">
@@ -50,21 +56,22 @@ export default function WriterBookmarksPage() {
           ))}
         </div>
       ) : bookmarkedBooks.length > 0 ? (
-        <div className="grid-ebooks">
-          {bookmarkedBooks.map((book) => (
-            <EbookCard key={book._id} ebook={book} />
+        <motion.div
+          className="grid-ebooks"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
+        >
+          {bookmarkedBooks.map((book, i) => (
+            <EbookCard key={book._id} ebook={book} index={i} />
           ))}
-        </div>
+        </motion.div>
       ) : (
         <div className="empty-state">
-          <div className="empty-icon">
-            <FiBookmark />
-          </div>
+          <div className="empty-icon"><FiBookmark /></div>
           <h3>No bookmarked books</h3>
-          <p>You haven't bookmarked any ebooks yet. Keep track of what you like!</p>
-          <Link href="/browse" className="btn btn-primary">
-            Explore Books
-          </Link>
+          <p>You haven't bookmarked any ebooks yet. Explore the catalog for inspiration!</p>
+          <Link href="/browse" className="btn btn-primary">Explore Books</Link>
         </div>
       )}
     </div>
