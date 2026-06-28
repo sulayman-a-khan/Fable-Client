@@ -773,3 +773,70 @@ h4 { font-size: 1.125rem; font-weight: 600; }
   .btn { padding: 0.625rem 1.25rem; font-size: 0.9rem; }
   .btn-lg { padding: 0.75rem 1.5rem; font-size: 1rem; }
 }
+
+/* ---------- Additional Mobile Enhancements ---------- */
+@media (max-width: 640px) {
+  /* Dashboard sidebar on mobile */
+  .dashboard-sidebar {
+    display: none;
+  }
+
+  /* Stack pagination on small screens */
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  /* Table horizontal scroll on mobile */
+  .table-container {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modal full-width on mobile */
+  .modal-content {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem) !important;
+  }
+
+  /* Stack form grids */
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Payment success card padding reduction */
+  .payment-card-mobile {
+    padding: 2rem 1.25rem !important;
+  }
+
+  /* Stat card smaller fonts */
+  .stat-value {
+    font-size: 1.75rem !important;
+  }
+}
+
+/* ---------- Print Styles ---------- */
+@media print {
+  .nav-container-fixed,
+  .footer-section,
+  .btn,
+  .sidebar {
+    display: none !important;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for keyboard nav */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
