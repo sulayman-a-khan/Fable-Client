@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { FiUsers, FiBookOpen, FiShoppingBag, FiDollarSign } from 'react-icons/fi';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import AnimatedStatCard from '@/components/ui/AnimatedStatCard';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -17,6 +18,7 @@ export default function AdminAnalyticsPage() {
   const [stats, setStats] = useState(null);
   const [monthlySales, setMonthlySales] = useState([]);
   const [genreData, setGenreData] = useState([]);
+  const [topEbooks, setTopEbooks] = useState([]);
 
   useEffect(() => {
     setMounted(true);
@@ -25,10 +27,11 @@ export default function AdminAnalyticsPage() {
   useEffect(() => {
     async function fetchAnalytics() {
       try {
-        const [overviewRes, monthlyRes, genreRes] = await Promise.all([
+        const [overviewRes, monthlyRes, genreRes, topEbooksRes] = await Promise.all([
           api.get('/analytics/overview'),
           api.get('/analytics/monthly-sales'),
-          api.get('/analytics/genre-distribution')
+          api.get('/analytics/genre-distribution'),
+          api.get('/analytics/top-ebooks'),
         ]);
 
         if (overviewRes.data.success) {
@@ -39,6 +42,9 @@ export default function AdminAnalyticsPage() {
         }
         if (genreRes.data.success) {
           setGenreData(genreRes.data.genreData || []);
+        }
+        if (topEbooksRes.data.success) {
+          setTopEbooks(topEbooksRes.data.topEbooks || []);
         }
       } catch (err) {
         console.error('Failed to load admin analytics', err);
@@ -70,50 +76,11 @@ export default function AdminAnalyticsPage() {
         gap: '1.5rem',
         marginBottom: '3rem'
       }}>
-        {/* Total Users */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)' }}>
-            <FiUsers />
-          </div>
-          <p className="stat-value">{stats?.totalUsers}</p>
-          <p className="stat-label">Total Registered Users</p>
-        </div>
-
-        {/* Total Writers */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent-secondary)' }}>
-            <FiUsers />
-          </div>
-          <p className="stat-value">{stats?.totalWriters}</p>
-          <p className="stat-label">Verified Authors</p>
-        </div>
-
-        {/* Total Ebooks */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
-            <FiBookOpen />
-          </div>
-          <p className="stat-value">{stats?.totalEbooks}</p>
-          <p className="stat-label">Total Ebooks</p>
-        </div>
-
-        {/* Sales */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899' }}>
-            <FiShoppingBag />
-          </div>
-          <p className="stat-value">{stats?.totalSold}</p>
-          <p className="stat-label">Purchases</p>
-        </div>
-
-        {/* Revenue */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)' }}>
-            <FiDollarSign />
-          </div>
-          <p className="stat-value">${stats?.totalRevenue?.toFixed(2)}</p>
-          <p className="stat-label">Total Revenue</p>
-        </div>
+        <AnimatedStatCard icon={FiUsers} value={stats?.totalUsers || 0} label="Total Registered Users" color="var(--accent-primary)" delay={0} />
+        <AnimatedStatCard icon={FiUsers} value={stats?.totalWriters || 0} label="Verified Authors" color="var(--accent-secondary)" bgColor="rgba(245,158,11,0.1)" delay={0.08} />
+        <AnimatedStatCard icon={FiBookOpen} value={stats?.totalEbooks || 0} label="Total Ebooks" color="#10b981" bgColor="rgba(16,185,129,0.1)" delay={0.16} />
+        <AnimatedStatCard icon={FiShoppingBag} value={stats?.totalSold || 0} label="Purchases" color="#ec4899" bgColor="rgba(236,72,153,0.1)" delay={0.24} />
+        <AnimatedStatCard icon={FiDollarSign} value={stats?.totalRevenue || 0} label="Total Revenue" color="var(--success)" bgColor="rgba(34,197,94,0.1)" prefix="$" suffix="" delay={0.32} />
       </div>
 
       {/* Charts section */}
@@ -194,6 +161,61 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
       </div>
+
+      {/* Top Performing Ebooks */}
+      {topEbooks.length > 0 && (
+        <div className="card" style={{ padding: '2rem', marginTop: '2.5rem' }}>
+          <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1.5rem', fontSize: '1.25rem' }}>
+            🏆 Top Performing Ebooks
+          </h3>
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Genre</th>
+                  <th>Price</th>
+                  <th>Copies Sold</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topEbooks.map((book, i) => (
+                  <tr key={book._id}>
+                    <td>
+                      <span style={{
+                        fontWeight: 700,
+                        color: i === 0 ? '#f59e0b' : i === 1 ? '#94a3b8' : i === 2 ? '#b45309' : 'var(--text-muted)',
+                        fontSize: '1rem'
+                      }}>#{i + 1}</span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ width: '32px', height: '44px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', flexShrink: 0 }}>
+                          <img
+                            src={book.coverImage || 'https://placehold.co/32x44?text=Cover'}
+                            alt={book.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => { e.target.src = 'https://placehold.co/32x44?text=Cover'; }}
+                          />
+                        </div>
+                        <span style={{ fontWeight: 600 }}>{book.title}</span>
+                      </div>
+                    </td>
+                    <td>{book.writer?.name || 'Unknown'}</td>
+                    <td><span className="badge badge-primary">{book.genre}</span></td>
+                    <td><strong>${book.price?.toFixed(2)}</strong></td>
+                    <td>
+                      <strong style={{ color: 'var(--success)' }}>{book.totalSold || 0}</strong>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
