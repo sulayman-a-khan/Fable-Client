@@ -34,6 +34,9 @@ export function AuthProvider({ children }) {
   const register = async (formData) => {
     const { data } = await api.post('/auth/register', formData);
     if (data.success) {
+      if (data.token) {
+        localStorage.setItem('fable_token', data.token);
+      }
       setUser(data.user);
       toast.success('Registration successful!');
       return data.user;
@@ -43,6 +46,9 @@ export function AuthProvider({ children }) {
   const login = async (formData) => {
     const { data } = await api.post('/auth/login', formData);
     if (data.success) {
+      if (data.token) {
+        localStorage.setItem('fable_token', data.token);
+      }
       setUser(data.user);
       toast.success('Welcome back!');
       return data.user;
@@ -52,6 +58,9 @@ export function AuthProvider({ children }) {
   const googleLogin = async (googleData) => {
     const { data } = await api.post('/auth/google', googleData);
     if (data.success) {
+      if (data.token) {
+        localStorage.setItem('fable_token', data.token);
+      }
       setUser(data.user);
       toast.success('Welcome!');
       return data.user;
@@ -64,6 +73,7 @@ export function AuthProvider({ children }) {
     } catch {
       // Continue with client-side logout even if API fails
     }
+    localStorage.removeItem('fable_token');
     setUser(null);
     toast.success('Logged out successfully');
     // Full page redirect to clear state
