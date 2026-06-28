@@ -56,6 +56,8 @@ export default function UserProfilePage() {
       setPwSaving(false);
     }
   };
+
+  const rolePerks = {
     user: [
       'Browse and search the entire ebook catalog.',
       'Securely purchase premium books via Stripe checkout.',
