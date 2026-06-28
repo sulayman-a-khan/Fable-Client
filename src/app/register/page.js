@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import RoleSelectionModal from '@/components/auth/RoleSelectionModal';
@@ -65,10 +66,15 @@ export default function RegisterPage() {
       background: 'radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05), transparent 40%), radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.03), transparent 40%)'
     }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
-        <div className="card" style={{
-          width: '100%',
-          maxWidth: '460px',
-          padding: '3rem 2.5rem'
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="card"
+          style={{
+            width: '100%',
+            maxWidth: '460px',
+            padding: '3rem 2.5rem'
         }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -205,7 +211,7 @@ export default function RegisterPage() {
               Sign In
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Role Selection Modal popup */}

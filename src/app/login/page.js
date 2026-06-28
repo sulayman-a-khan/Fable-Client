@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { FiMail, FiLock, FiBookOpen, FiArrowRight } from 'react-icons/fi';
@@ -47,11 +48,17 @@ export default function LoginPage() {
       background: 'radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05), transparent 40%), radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.03), transparent 40%)'
     }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
-        <div className="card" style={{
-          width: '100%',
-          maxWidth: '460px',
-          padding: '3rem 2.5rem'
-        }}>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="card"
+          style={{
+            width: '100%',
+            maxWidth: '460px',
+            padding: '3rem 2.5rem'
+          }}
+        >
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '1.8rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }} className="text-gradient">
@@ -149,7 +156,7 @@ export default function LoginPage() {
               Create Account
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
