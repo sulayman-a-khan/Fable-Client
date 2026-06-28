@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
-import { FiShoppingBag, FiBookOpen } from 'react-icons/fi';
+import { FiShoppingBag, FiBookOpen, FiDollarSign } from 'react-icons/fi';
 
 export default function UserPurchasesPage() {
   const [purchases, setPurchases] = useState([]);
@@ -13,9 +14,7 @@ export default function UserPurchasesPage() {
     async function fetchPurchases() {
       try {
         const { data } = await api.get('/transactions/user');
-        if (data.success) {
-          setPurchases(data.transactions || []);
-        }
+        if (data.success) setPurchases(data.transactions || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -25,21 +24,43 @@ export default function UserPurchasesPage() {
     fetchPurchases();
   }, []);
 
+  const totalSpent = purchases.reduce((sum, p) => sum + (p.amount || 0), 0);
+
   return (
     <div>
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>Purchase History</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>View and access all ebooks you have purchased on Fable.</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}
+      >
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>Purchase History</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>View and access all ebooks you have purchased on Fable.</p>
+        </div>
+        {purchases.length > 0 && (
+          <div className="card" style={{ padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <FiDollarSign style={{ color: 'var(--success)' }} />
+            <span style={{ fontSize: '0.9rem' }}>
+              Total spent: <strong style={{ color: 'var(--success)' }}>${totalSpent.toFixed(2)}</strong>
+            </span>
+          </div>
+        )}
+      </motion.div>
 
       {loading ? (
         <div className="card" style={{ padding: '2rem' }}>
           {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton" style={{ height: '50px', marginBottom: '1rem', width: '100%' }}></div>
+            <div key={i} className="skeleton" style={{ height: '60px', marginBottom: '1rem', width: '100%' }}></div>
           ))}
         </div>
       ) : purchases.length > 0 ? (
-        <div className="table-container">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="table-container"
+        >
           <table className="table">
             <thead>
               <tr>
@@ -63,30 +84,34 @@ export default function UserPurchasesPage() {
                             src={book.coverImage}
                             alt={book.title || 'Book Cover'}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={(e) => {
-                              e.target.src = 'https://via.placeholder.com/40x56?text=Cover';
-                            }}
+                            onError={(e) => { e.target.src = 'https://placehold.co/40x56?text=Cover'; }}
                           />
                         </div>
                         <div>
-                          <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{book.title || 'Deleted Book'}</p>
-                          <span className="badge badge-primary" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>{book.genre}</span>
+                          <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{book.title || 'Deleted Book'}</p>
+                          {book.genre && <span className="badge badge-primary" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>{book.genre}</span>}
                         </div>
                       </div>
                     </td>
                     <td>{purchase.writer?.name || 'Unknown Author'}</td>
-                    <td>
-                      <strong>${purchase.amount?.toFixed(2)}</strong>
+                    <td><strong style={{ color: 'var(--success)' }}>${purchase.amount?.toFixed(2)}</strong></td>
+                    <td style={{ whiteSpace: 'nowrap' }}>
+                      {new Date(purchase.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </td>
-                    <td>{new Date(purchase.createdAt).toLocaleDateString()}</td>
                     <td>
-                      <span className="badge badge-success">{purchase.status}</span>
+                      <span style={{
+                        padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 600,
+                        background: purchase.status === 'completed' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+                        color: purchase.status === 'completed' ? 'var(--success)' : 'var(--danger)',
+                      }}>
+                        {purchase.status}
+                      </span>
                     </td>
                     <td>
                       {book._id ? (
-                        <Link href={`/ebooks/${book._id}#reading-pane`} className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <FiBookOpen />
-                          <span>Read Now</span>
+                        <Link href={`/ebooks/${book._id}#reading-pane`} className="btn btn-primary btn-sm"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <FiBookOpen /><span>Read</span>
                         </Link>
                       ) : (
                         <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Unavailable</span>
@@ -97,17 +122,13 @@ export default function UserPurchasesPage() {
               })}
             </tbody>
           </table>
-        </div>
+        </motion.div>
       ) : (
         <div className="empty-state">
-          <div className="empty-icon">
-            <FiShoppingBag />
-          </div>
+          <div className="empty-icon"><FiShoppingBag /></div>
           <h3>No purchases yet</h3>
           <p>You haven't bought any ebooks yet. Discover great literature in our library!</p>
-          <Link href="/browse" className="btn btn-primary">
-            Browse Library
-          </Link>
+          <Link href="/browse" className="btn btn-primary">Browse Library</Link>
         </div>
       )}
     </div>
