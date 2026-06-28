@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { FiCheckCircle, FiBookOpen, FiArrowRight, FiAlertTriangle } from 'react-icons/fi';
@@ -73,7 +74,12 @@ export default function PaymentSuccessPage() {
   return (
     <div className="page-wrapper" style={{ padding: '6rem 0' }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
-        <div className="card" style={{
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 24 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: 'easeOut' }}
+          className="card"
+          style={{
           padding: '4rem 3rem',
           maxWidth: '500px',
           width: '100%',
@@ -81,7 +87,13 @@ export default function PaymentSuccessPage() {
           border: '1px solid var(--success)',
           boxShadow: '0 0 40px rgba(34, 197, 94, 0.15)'
         }}>
-          <FiCheckCircle style={{ fontSize: '5rem', color: 'var(--success)', marginBottom: '1.5rem' }} />
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+          >
+            <FiCheckCircle style={{ fontSize: '5rem', color: 'var(--success)', marginBottom: '1.5rem' }} />
+          </motion.div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', marginBottom: '1rem' }}>Thank You!</h1>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.05rem', lineHeight: '1.6' }}>
             Your payment was completed successfully. The ebook has been added to your digital library.
@@ -128,7 +140,7 @@ export default function PaymentSuccessPage() {
               Go to My Purchases
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
