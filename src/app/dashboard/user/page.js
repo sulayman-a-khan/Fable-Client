@@ -2,32 +2,33 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
-import { FiShoppingBag, FiBookmark, FiBookOpen, FiUser, FiArrowRight } from 'react-icons/fi';
+import AnimatedStatCard from '@/components/ui/AnimatedStatCard';
+import { FiShoppingBag, FiBookmark, FiBookOpen, FiUser, FiArrowRight, FiCompass, FiDollarSign } from 'react-icons/fi';
 
 export default function UserOverviewPage() {
   const { user } = useAuth();
   const [purchaseCount, setPurchaseCount] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
   const [bookmarkCount, setBookmarkCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [purchasesRes, bookmarksRes] = await Promise.all([
-          api.get('/transactions/user'),
-          api.get('/bookmarks')
+        const [summaryRes, bookmarksRes] = await Promise.all([
+          api.get('/transactions/summary'),
+          api.get('/bookmarks'),
         ]);
-        
-        if (purchasesRes.data.success) {
-          setPurchaseCount(purchasesRes.data.transactions?.length || 0);
+        if (summaryRes.data.success) {
+          setPurchaseCount(summaryRes.data.summary.totalPurchases || 0);
+          setTotalSpent(summaryRes.data.summary.totalSpent || 0);
         }
-        if (bookmarksRes.data.success) {
-          setBookmarkCount(bookmarksRes.data.bookmarks?.length || 0);
-        }
+        if (bookmarksRes.data.success) setBookmarkCount(bookmarksRes.data.bookmarks?.length || 0);
       } catch (err) {
-        console.error('Failed to load user overview stats', err);
+        console.error('Failed to load user stats', err);
       } finally {
         setLoading(false);
       }
@@ -35,67 +36,72 @@ export default function UserOverviewPage() {
     fetchStats();
   }, []);
 
+  const quickActions = [
+    { href: '/browse', label: 'Discover Ebooks', icon: FiCompass, primary: true },
+    { href: '/dashboard/user/library', label: 'My Library', icon: FiBookOpen, primary: false },
+    { href: '/dashboard/user/purchases', label: 'My Purchases', icon: FiShoppingBag, primary: false },
+    { href: '/dashboard/user/bookmarks', label: 'My Bookmarks', icon: FiBookmark, primary: false },
+    { href: '/dashboard/user/profile', label: 'My Profile', icon: FiUser, primary: false },
+  ];
+
   return (
     <div>
-      {/* Welcome header */}
-      <div style={{ marginBottom: '2.5rem' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ marginBottom: '2.5rem' }}
+      >
         <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
           Hello, <span className="text-gradient">{user.name}</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)' }}>
           Welcome to your Fable bookshelf. Access your library, manage bookmarks, or view purchases below.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Stats Cards */}
+      {/* Animated Stats */}
       <div className="grid-3" style={{ marginBottom: '3rem' }}>
-        {/* Purchases stat */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)' }}>
-            <FiShoppingBag />
-          </div>
-          <p className="stat-value">{loading ? '...' : purchaseCount}</p>
-          <p className="stat-label">Purchased Books</p>
-        </div>
-
-        {/* Bookmarks stat */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent-secondary)' }}>
-            <FiBookmark />
-          </div>
-          <p className="stat-value">{loading ? '...' : bookmarkCount}</p>
-          <p className="stat-label">Bookmarked Books</p>
-        </div>
-
-        {/* Profile Card */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)' }}>
-            <FiUser />
-          </div>
-          <p className="stat-value" style={{ fontSize: '1.25rem', height: '2rem', display: 'flex', alignItems: 'center' }}>
-            {user.role.toUpperCase()}
-          </p>
-          <p className="stat-label">Account Membership</p>
-        </div>
+        {loading ? (
+          [1, 2, 3].map((i) => (
+            <div key={i} className="stat-card skeleton-card">
+              <div className="skeleton" style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}></div>
+              <div className="skeleton skeleton-text lg" style={{ marginBottom: '0.5rem' }}></div>
+              <div className="skeleton skeleton-text sm"></div>
+            </div>
+          ))
+        ) : (
+          <>
+            <AnimatedStatCard icon={FiShoppingBag} value={purchaseCount} label="Purchased Books" color="var(--accent-primary)" delay={0} />
+            <AnimatedStatCard icon={FiBookmark} value={bookmarkCount} label="Bookmarked Books" color="var(--accent-secondary)" bgColor="rgba(245,158,11,0.1)" delay={0.1} />
+            <AnimatedStatCard icon={FiDollarSign} value={totalSpent} label="Total Spent" color="var(--success)" bgColor="rgba(34,197,94,0.1)" prefix="$" delay={0.2} />
+          </>
+        )}
       </div>
 
-      {/* Quick Action Links */}
-      <div className="card" style={{ padding: '2rem' }}>
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.25 }}
+        className="card"
+        style={{ padding: '2.5rem' }}
+      >
         <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '1.5rem' }}>Quick Actions</h3>
-        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-          <Link href="/browse" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FiBookOpen />
-            <span>Discover Ebooks</span>
-            <FiArrowRight />
-          </Link>
-          <Link href="/dashboard/user/library" className="btn btn-secondary">
-            Go to Library
-          </Link>
-          <Link href="/dashboard/user/bookmarks" className="btn btn-secondary">
-            View Bookmarks
-          </Link>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+          {quickActions.map(({ href, label, icon: Icon, primary }) => (
+            <Link key={href} href={href}
+              className={`btn ${primary ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.875rem 1.25rem' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Icon /> {label}
+              </span>
+              <FiArrowRight style={{ opacity: 0.6 }} />
+            </Link>
+          ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
