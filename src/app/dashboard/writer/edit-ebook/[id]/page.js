@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { FiBookOpen, FiDollarSign, FiSave, FiArrowLeft, FiUploadCloud, FiCheckCircle } from 'react-icons/fi';
@@ -147,7 +148,11 @@ export default function EditEbookPage() {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <button
         onClick={() => router.back()}
         style={{
@@ -345,6 +350,6 @@ export default function EditEbookPage() {
           background: var(--bg-surface) !important;
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
