@@ -2,41 +2,45 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FiBook, FiUser, FiTag } from 'react-icons/fi';
+import { FiUser, FiTag, FiBookOpen } from 'react-icons/fi';
 
-export default function EbookCard({ ebook }) {
+export default function EbookCard({ ebook, index = 0 }) {
   const { _id, title, price, genre, coverImage, writer } = ebook;
   const writerName = writer?.name || 'Unknown Writer';
 
   return (
     <motion.div
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.07, ease: 'easeOut' }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className="card"
       style={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        position: 'relative'
+        position: 'relative',
+        cursor: 'pointer'
       }}
     >
       {/* Cover Image Container */}
       <Link href={`/ebooks/${_id}`} style={{ display: 'block', overflow: 'hidden', position: 'relative', aspectRatio: '3/4.2' }}>
-        <img
-          src={coverImage || 'https://via.placeholder.com/300x420?text=No+Cover'}
-          alt={title}
-          className="card-image"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transition: 'transform var(--transition-slow)'
-          }}
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/300x420?text=No+Cover';
-          }}
-        />
+        <motion.div
+          style={{ position: 'absolute', inset: 0 }}
+          whileHover={{ scale: 1.08 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Image
+            src={coverImage || 'https://placehold.co/300x420?text=No+Cover'}
+            alt={title}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            style={{ objectFit: 'cover' }}
+          />
+        </motion.div>
         {/* Genre Overlay Badge */}
         <div style={{
           position: 'absolute',
@@ -48,6 +52,25 @@ export default function EbookCard({ ebook }) {
             {genre}
           </span>
         </div>
+
+        {/* Free badge */}
+        {price === 0 && (
+          <div style={{
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            zIndex: 10,
+            background: 'var(--success)',
+            color: 'white',
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            padding: '0.2rem 0.6rem',
+            borderRadius: 'var(--radius-full)',
+            letterSpacing: '0.05em'
+          }}>
+            FREE
+          </div>
+        )}
       </Link>
 
       {/* Card Content */}
@@ -60,7 +83,7 @@ export default function EbookCard({ ebook }) {
         {/* Title */}
         <h4 style={{
           fontFamily: 'var(--font-heading)',
-          fontSize: '1.15rem',
+          fontSize: '1.1rem',
           fontWeight: 600,
           lineHeight: '1.3',
           marginBottom: '0.5rem',
@@ -84,7 +107,7 @@ export default function EbookCard({ ebook }) {
           color: 'var(--text-secondary)',
           marginBottom: '1rem'
         }}>
-          <FiUser style={{ color: 'var(--accent-secondary)' }} />
+          <FiUser style={{ color: 'var(--accent-secondary)', flexShrink: 0 }} />
           <span style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -105,15 +128,22 @@ export default function EbookCard({ ebook }) {
             <FiTag style={{ color: 'var(--accent-secondary)', fontSize: '0.9rem' }} />
             <span style={{
               fontWeight: 700,
-              fontSize: '1.2rem',
-              color: 'var(--text-primary)'
+              fontSize: '1.15rem',
+              color: price === 0 ? 'var(--success)' : 'var(--text-primary)'
             }}>
               {price === 0 ? 'Free' : `$${price.toFixed(2)}`}
             </span>
           </div>
 
-          <Link href={`/ebooks/${_id}`} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
-            Details
+          <Link href={`/ebooks/${_id}`} className="btn btn-secondary btn-sm" style={{
+            padding: '0.4rem 0.8rem',
+            fontSize: '0.8rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem'
+          }}>
+            <FiBookOpen />
+            View
           </Link>
         </div>
       </div>
