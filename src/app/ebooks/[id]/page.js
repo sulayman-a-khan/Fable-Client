@@ -2,11 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
-import { FiBook, FiBookmark, FiHeart, FiUser, FiCalendar, FiTag, FiShoppingBag, FiArrowLeft, FiUnlock } from 'react-icons/fi';
+import Link from 'next/link';
+import { FiBook, FiBookmark, FiHeart, FiUser, FiCalendar, FiTag, FiShoppingBag, FiArrowLeft, FiUnlock, FiClock } from 'react-icons/fi';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import EbookCard from '@/components/ebooks/EbookCard';
 
 export default function EbookDetailPage() {
   const { id } = useParams();
@@ -17,15 +20,25 @@ export default function EbookDetailPage() {
   const [loading, setLoading] = useState(true);
   const [purchased, setPurchased] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkCount, setBookmarkCount] = useState(0);
   const [purchaseChecking, setPurchaseChecking] = useState(true);
   const [bookmarkChecking, setBookmarkChecking] = useState(true);
   const [buying, setBuying] = useState(false);
+  const [relatedEbooks, setRelatedEbooks] = useState([]);
 
   const fetchEbookDetails = useCallback(async () => {
     try {
       const { data } = await api.get(`/ebooks/${id}`);
       if (data.success) {
         setEbook(data.ebook);
+        // Fetch related in background
+        api.get(`/ebooks/${id}/related`).then(({ data: rel }) => {
+          if (rel.success) setRelatedEbooks(rel.ebooks || []);
+        }).catch(() => {});
+        // Fetch public bookmark count
+        api.get(`/bookmarks/count/${id}`).then(({ data: bc }) => {
+          if (bc.success) setBookmarkCount(bc.count || 0);
+        }).catch(() => {});
       } else {
         toast.error('Ebook not found');
         router.push('/browse');
@@ -103,6 +116,7 @@ export default function EbookDetailPage() {
       const { data } = await api.post(`/bookmarks/${id}`);
       if (data.success) {
         setBookmarked(data.bookmarked);
+        setBookmarkCount((prev) => data.bookmarked ? prev + 1 : Math.max(0, prev - 1));
         toast.success(data.bookmarked ? 'Bookmarked!' : 'Removed from bookmarks');
       }
     } catch (err) {
@@ -275,6 +289,16 @@ export default function EbookDetailPage() {
                     <span>{ebook.totalSold || 0}</span>
                   </div>
                 </div>
+
+                {ebook.readingTimeMinutes > 0 && (
+                  <div>
+                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>READ TIME</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+                      <FiClock style={{ color: 'var(--accent-secondary)' }} />
+                      <span>~{ebook.readingTimeMinutes} min</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}
@@ -307,6 +331,15 @@ export default function EbookDetailPage() {
                 >
                   <FiBookmark fill={bookmarked ? 'currentColor' : 'none'} />
                   <span>{bookmarked ? 'Bookmarked' : 'Add Bookmark'}</span>
+                  {bookmarkCount > 0 && (
+                    <span style={{
+                      background: 'rgba(255,255,255,0.1)',
+                      borderRadius: 'var(--radius-full)',
+                      padding: '0.1rem 0.5rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                    }}>{bookmarkCount}</span>
+                  )}
                 </button>
               </div>
             </div>
@@ -390,6 +423,31 @@ export default function EbookDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Related Ebooks */}
+      {relatedEbooks.length > 0 && (
+        <div style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--glass-border)', padding: '4rem 0', marginTop: '4rem' }}>
+          <div className="container">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              style={{ marginBottom: '2rem' }}
+            >
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.75rem' }}>
+                More in <span className="text-gradient">{ebook.genre}</span>
+              </h2>
+              <p style={{ color: 'var(--text-secondary)' }}>You might also enjoy these titles.</p>
+            </motion.div>
+            <div className="grid-ebooks">
+              {relatedEbooks.map((rel, i) => (
+                <EbookCard key={rel._id} ebook={rel} index={i} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
