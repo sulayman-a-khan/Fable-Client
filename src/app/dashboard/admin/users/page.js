@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import { FiUsers, FiTrash2, FiShield, FiX, FiCheck } from 'react-icons/fi';
@@ -79,13 +80,23 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: '2.5rem' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ marginBottom: '2.5rem' }}
+      >
         <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>Manage Users</h1>
         <p style={{ color: 'var(--text-secondary)' }}>Modify user permissions or delete user accounts.</p>
-      </div>
+      </motion.div>
 
       {users.length > 0 ? (
-        <div className="table-container">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="table-container"
+        >
           <table className="table">
             <thead>
               <tr>
@@ -161,7 +172,7 @@ export default function AdminUsersPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </motion.div>
       ) : (
         <div className="empty-state">
           <div className="empty-icon">
