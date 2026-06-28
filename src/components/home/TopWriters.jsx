@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import api from '@/lib/api';
-import { FiAward, FiBookOpen, FiUser } from 'react-icons/fi';
+import { FiAward, FiBookOpen, FiUser, FiShoppingBag } from 'react-icons/fi';
+
+const RANK_COLORS = ['#f59e0b', '#94a3b8', '#b45309'];
+const RANK_LABELS = ['Gold', 'Silver', 'Bronze'];
 
 export default function TopWriters() {
   const [writers, setWriters] = useState([]);
@@ -31,13 +35,19 @@ export default function TopWriters() {
       borderBottom: '1px solid var(--glass-border)'
     }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{ textAlign: 'center', marginBottom: '3rem' }}
+        >
           <span className="badge badge-warning" style={{ marginBottom: '0.75rem' }}>Top Talents</span>
           <h2 style={{ fontFamily: 'var(--font-heading)' }}>Featured Writers</h2>
           <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0.5rem auto 0 auto' }}>
             Meet our most popular authors, contributing exceptional books and inspiring our global reading community.
           </p>
-        </div>
+        </motion.div>
 
         {loading ? (
           <div className="grid-3">
@@ -52,14 +62,32 @@ export default function TopWriters() {
         ) : writers.length > 0 ? (
           <div className="grid-3">
             {writers.map((writer, index) => (
-              <div key={writer._id} className="card" style={{
-                padding: '2.5rem 2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                position: 'relative'
-              }}>
+              <motion.div
+                key={writer._id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.12 }}
+                whileHover={{ y: -6 }}
+                className="card"
+                style={{
+                  padding: '2.5rem 2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Rank glow background */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0,
+                  height: '4px',
+                  background: `linear-gradient(90deg, ${RANK_COLORS[index]}, transparent)`,
+                }} />
+
                 {/* Ranking Badge */}
                 <div style={{
                   position: 'absolute',
@@ -68,38 +96,38 @@ export default function TopWriters() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.25rem',
-                  color: index === 0 ? '#f59e0b' : index === 1 ? '#cbd5e1' : '#b45309',
-                  fontWeight: '700',
-                  fontSize: '0.9rem'
+                  color: RANK_COLORS[index],
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
                 }}>
-                  <FiAward style={{ fontSize: '1.2rem' }} />
+                  <FiAward style={{ fontSize: '1.1rem' }} />
                   <span>#{index + 1}</span>
                 </div>
 
                 {/* Avatar */}
-                <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
+                <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
                   {writer.avatar ? (
                     <img
                       src={writer.avatar}
                       alt={writer.name}
                       style={{
-                        width: '90px',
-                        height: '90px',
+                        width: '88px',
+                        height: '88px',
                         borderRadius: '50%',
                         objectFit: 'cover',
-                        border: '2px solid var(--glass-border)'
+                        border: `2px solid ${RANK_COLORS[index]}`,
                       }}
                     />
                   ) : (
                     <div style={{
-                      width: '90px',
-                      height: '90px',
+                      width: '88px',
+                      height: '88px',
                       borderRadius: '50%',
                       background: 'var(--bg-tertiary)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      border: '2px solid var(--glass-border)'
+                      border: `2px solid ${RANK_COLORS[index]}`,
                     }}>
                       <FiUser style={{ fontSize: '2.5rem', color: 'var(--text-muted)' }} />
                     </div>
@@ -108,40 +136,48 @@ export default function TopWriters() {
 
                 <h3 style={{
                   fontFamily: 'var(--font-heading)',
-                  fontSize: '1.3rem',
+                  fontSize: '1.25rem',
                   fontWeight: 600,
-                  marginBottom: '0.5rem',
-                  color: 'var(--text-primary)'
+                  marginBottom: '1.25rem',
+                  color: 'var(--text-primary)',
                 }}>{writer.name}</h3>
 
-                <p style={{
-                  fontSize: '0.85rem',
-                  color: 'var(--text-muted)',
-                  marginBottom: '1.5rem'
-                }}>{writer.email}</p>
-
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.95rem',
-                  color: 'var(--text-secondary)',
-                  background: 'var(--bg-tertiary)',
-                  padding: '0.5rem 1rem',
-                  borderRadius: 'var(--radius-full)'
-                }}>
-                  <FiBookOpen style={{ color: 'var(--accent-secondary)' }} />
-                  <span>
-                    <strong>{writer.salesCount || 0}</strong> Ebook Sales
-                  </span>
+                {/* Stats row */}
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-tertiary)',
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: 'var(--radius-full)',
+                  }}>
+                    <FiBookOpen style={{ color: 'var(--accent-primary)', fontSize: '0.85rem' }} />
+                    <span><strong>{writer.ebookCount || 0}</strong> Books</span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-tertiary)',
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: 'var(--radius-full)',
+                  }}>
+                    <FiShoppingBag style={{ color: 'var(--accent-secondary)', fontSize: '0.85rem' }} />
+                    <span><strong>{writer.totalSold || 0}</strong> Sales</span>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         ) : (
           <div className="empty-state">
-            <h3 style={{ color: 'var(--text-secondary)' }}>No writers featured</h3>
-            <p>Become a writer and upload your creation to become our top author!</p>
+            <h3 style={{ color: 'var(--text-secondary)' }}>No featured writers yet</h3>
+            <p>Become a writer and publish your first ebook to join our top authors!</p>
           </div>
         )}
       </div>
