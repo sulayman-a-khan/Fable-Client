@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -74,14 +75,19 @@ export default function WriterEbooksPage() {
 
   return (
     <div>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '2.5rem',
-        flexWrap: 'wrap',
-        gap: '1rem'
-      }}>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '2.5rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}
+      >
         <div>
           <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>Manage Ebooks</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Publish, edit, delete, or manage your catalog status.</p>
@@ -90,7 +96,7 @@ export default function WriterEbooksPage() {
           <FiPlusCircle />
           <span>Upload Ebook</span>
         </Link>
-      </div>
+      </motion.div>
 
       {loading ? (
         <div className="card" style={{ padding: '2rem' }}>
