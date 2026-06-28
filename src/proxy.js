@@ -1,17 +1,9 @@
 import { NextResponse } from 'next/server';
 
+// Dashboard auth guard is handled client-side in dashboard/layout.js
+// via AuthContext (Bearer token in localStorage).
+// Server-side middleware cannot access localStorage, so we pass through.
 export function proxy(request) {
-  const path = request.nextUrl.pathname;
-
-  if (path.startsWith('/dashboard')) {
-    const token = request.cookies.get('fable_token')?.value;
-
-    if (!token) {
-      const loginUrl = new URL('/login', request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
   return NextResponse.next();
 }
 
