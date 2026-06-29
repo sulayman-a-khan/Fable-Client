@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 import AnimatedStatCard from '@/components/ui/AnimatedStatCard';
-import { FiBookOpen, FiShoppingBag, FiDollarSign, FiPlusCircle, FiTrendingUp, FiArrowRight } from 'react-icons/fi';
+import { FiBookOpen, FiShoppingBag, FiDollarSign, FiPlusCircle, FiTrendingUp, FiArrowRight, FiUser } from 'react-icons/fi';
 
 export default function WriterOverviewPage() {
   const { user } = useAuth();
@@ -32,6 +32,7 @@ export default function WriterOverviewPage() {
     { href: '/dashboard/writer/ebooks', label: 'Manage Creations', icon: FiBookOpen, primary: false },
     { href: '/dashboard/writer/sales', label: 'Sales History', icon: FiShoppingBag, primary: false },
     { href: '/dashboard/writer/bookmarks', label: 'My Bookmarks', icon: FiTrendingUp, primary: false },
+    { href: '/dashboard/user/profile', label: 'My Profile', icon: FiUser, primary: false },
   ];
 
   return (

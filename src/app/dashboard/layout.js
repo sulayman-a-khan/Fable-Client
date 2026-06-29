@@ -37,6 +37,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Manage Users', href: '/dashboard/admin/users', icon: FiUsers },
         { name: 'Manage Ebooks', href: '/dashboard/admin/ebooks', icon: FiBookOpen },
         { name: 'All Transactions', href: '/dashboard/admin/transactions', icon: FiShoppingBag },
+        { name: 'My Profile', href: '/dashboard/user/profile', icon: FiUser },
       ];
     }
 
@@ -47,6 +48,7 @@ export default function DashboardLayout({ children }) {
         { name: 'Upload Ebook', href: '/dashboard/writer/add-ebook', icon: FiPlusCircle },
         { name: 'Sales History', href: '/dashboard/writer/sales', icon: FiShoppingBag },
         { name: 'Bookmarks', href: '/dashboard/writer/bookmarks', icon: FiBookmark },
+        { name: 'My Profile', href: '/dashboard/user/profile', icon: FiUser },
       ];
     }
 
