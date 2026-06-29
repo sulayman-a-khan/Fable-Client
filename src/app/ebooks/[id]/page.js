@@ -253,7 +253,7 @@ export default function EbookDetailPage() {
                 ) : (
                   <FiUser style={{ color: 'var(--accent-secondary)' }} />
                 )}
-                <span>By <strong>{ebook.writer?.name || 'Unknown Writer'}</strong></span>
+                <span>By <Link href={`/writers/${ebook.writer?._id}`} style={{ color: 'inherit', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'var(--accent-primary)'} onMouseLeave={(e) => e.target.style.color = 'inherit'}><strong>{ebook.writer?.name || 'Unknown Writer'}</strong></Link></span>
               </div>
 
               {/* Book Metadata */}

@@ -71,6 +71,25 @@ export default function EbookCard({ ebook, index = 0 }) {
             FREE
           </div>
         )}
+
+        {/* Purchased badge */}
+        {ebook.isPurchased && (
+          <div style={{
+            position: 'absolute',
+            top: '1rem',
+            left: price === 0 ? '4.5rem' : '1rem',
+            zIndex: 10,
+            background: 'var(--accent-secondary)',
+            color: 'white',
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            padding: '0.2rem 0.6rem',
+            borderRadius: 'var(--radius-full)',
+            letterSpacing: '0.05em'
+          }}>
+            PURCHASED
+          </div>
+        )}
       </Link>
 
       {/* Card Content */}
@@ -108,11 +127,20 @@ export default function EbookCard({ ebook, index = 0 }) {
           marginBottom: '1rem'
         }}>
           <FiUser style={{ color: 'var(--accent-secondary)', flexShrink: 0 }} />
-          <span style={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>{writerName}</span>
+          <Link
+            href={`/writers/${writer?._id || writer}`}
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              color: 'var(--text-secondary)',
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => e.target.style.color = 'var(--accent-primary)'}
+            onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+          >
+            {writerName}
+          </Link>
         </div>
 
         {/* Pricing & CTA */}

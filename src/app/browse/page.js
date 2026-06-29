@@ -22,6 +22,7 @@ export default function BrowsePage() {
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
+  const [availability, setAvailability] = useState(searchParams.get('availability') || '');
   const [page, setPage] = useState(parseInt(searchParams.get('page'), 10) || 1);
 
   // API response states
@@ -41,10 +42,11 @@ export default function BrowsePage() {
     if (minPrice) params.set('minPrice', minPrice);
     if (maxPrice) params.set('maxPrice', maxPrice);
     if (sort !== 'newest') params.set('sort', sort);
+    if (availability) params.set('availability', availability);
     if (page > 1) params.set('page', page);
 
     router.replace(`/browse?${params.toString()}`);
-  }, [searchText, genre, minPrice, maxPrice, sort, page, router]);
+  }, [searchText, genre, minPrice, maxPrice, sort, availability, page, router]);
 
   // Fetch ebooks whenever states or parameters update
   useEffect(() => {
@@ -68,6 +70,7 @@ export default function BrowsePage() {
       if (genre) params.genre = genre;
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
+      if (availability) params.availability = availability;
 
       const { data } = await api.get('/ebooks', { params });
       if (data.success) {
@@ -80,7 +83,7 @@ export default function BrowsePage() {
     } finally {
       setLoading(false);
     }
-  }, [page, sort, search, genre, minPrice, maxPrice]);
+  }, [page, sort, search, genre, minPrice, maxPrice, availability]);
 
   useEffect(() => {
     fetchEbooks();
@@ -102,6 +105,7 @@ export default function BrowsePage() {
     setMinPrice('');
     setMaxPrice('');
     setSort('newest');
+    setAvailability('');
     setPage(1);
   };
 
@@ -200,7 +204,7 @@ export default function BrowsePage() {
                   <FiSliders style={{ color: 'var(--accent-secondary)' }} />
                   <span>Filter Options</span>
                 </div>
-                {(genre || minPrice || maxPrice || search) && (
+                {(genre || minPrice || maxPrice || search || availability) && (
                   <button
                     onClick={handleResetFilters}
                     style={{
@@ -272,6 +276,23 @@ export default function BrowsePage() {
                       min="0"
                     />
                   </div>
+                </div>
+
+                {/* Availability Filter */}
+                <div>
+                  <label className="form-label">Availability</label>
+                  <select
+                    value={availability}
+                    onChange={(e) => {
+                      setAvailability(e.target.value);
+                      setPage(1);
+                    }}
+                    className="form-select"
+                  >
+                    <option value="">All</option>
+                    <option value="in-stock">In Stock</option>
+                    <option value="sold">Sold</option>
+                  </select>
                 </div>
               </div>
             </div>
