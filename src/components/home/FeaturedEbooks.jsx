@@ -66,7 +66,7 @@ export default function FeaturedEbooks() {
 
         {loading ? (
           <div className="grid-ebooks">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} className="card skeleton-card" style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="skeleton skeleton-image" style={{ aspectRatio: '3/4.2' }}></div>
                 <div className="card-body" style={{ padding: '1.25rem' }}>

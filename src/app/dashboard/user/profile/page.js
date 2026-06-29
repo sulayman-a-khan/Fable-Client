@@ -100,7 +100,7 @@ export default function UserProfilePage() {
           style={{ padding: '2.5rem' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '2rem' }}>
-            <div style={{ position: 'relative', marginBottom: '1rem' }}>
+            <div style={{ position: 'relative', marginBottom: '1rem', cursor: 'pointer' }} className="avatar-container">
               {user.avatar ? (
                 <img
                   src={user.avatar}
@@ -117,6 +117,47 @@ export default function UserProfilePage() {
                   <FiUser style={{ fontSize: '3rem' }} />
                 </div>
               )}
+              
+              <label htmlFor="avatar-upload" style={{
+                position: 'absolute', bottom: 0, right: 0,
+                background: 'var(--accent-primary)', color: 'white',
+                borderRadius: '50%', width: '32px', height: '32px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', border: '2px solid var(--bg-primary)',
+                boxShadow: 'var(--shadow-md)'
+              }}>
+                <FiEdit2 style={{ fontSize: '0.9rem' }} />
+              </label>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  const formData = new FormData();
+                  formData.append('image', file);
+
+                  const uploadToast = toast.loading('Uploading profile picture...');
+                  try {
+                    const { data: uploadData } = await api.post('/upload/image', formData, {
+                      headers: { 'Content-Type': 'multipart/form-data' }
+                    });
+
+                    if (uploadData.success && uploadData.imageUrl) {
+                      const { data: profileData } = await api.patch('/users/profile', { avatar: uploadData.imageUrl });
+                      if (profileData.success) {
+                        await refreshUser();
+                        toast.success('Profile picture updated!', { id: uploadToast });
+                      }
+                    }
+                  } catch (err) {
+                    toast.error(err.response?.data?.message || 'Failed to upload profile picture', { id: uploadToast });
+                  }
+                }}
+              />
             </div>
 
             {/* Editable Name */}
