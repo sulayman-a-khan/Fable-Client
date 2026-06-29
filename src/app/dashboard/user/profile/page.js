@@ -251,7 +251,7 @@ export default function UserProfilePage() {
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {(privilegeMap[user.role] || privilegeMap.user).map((item, i) => (
+            {(rolePerks[user.role] || rolePerks.user).map((item, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
                 <div style={{
                   width: '20px', height: '20px', borderRadius: '50%',
