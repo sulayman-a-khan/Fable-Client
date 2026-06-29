@@ -142,9 +142,11 @@ export default function UserProfilePage() {
 
                   const uploadToast = toast.loading('Uploading profile picture...');
                   try {
-                    const { data: uploadData } = await api.post('/upload/image', formData, {
-                      headers: { 'Content-Type': 'multipart/form-data' }
+                    const response = await fetch('/api/upload', {
+                      method: 'POST',
+                      body: formData,
                     });
+                    const uploadData = await response.json();
 
                     if (uploadData.success && uploadData.imageUrl) {
                       const { data: profileData } = await api.patch('/users/profile', { avatar: uploadData.imageUrl });
@@ -152,9 +154,11 @@ export default function UserProfilePage() {
                         await refreshUser();
                         toast.success('Profile picture updated!', { id: uploadToast });
                       }
+                    } else {
+                      toast.error(uploadData.message || 'Failed to upload image', { id: uploadToast });
                     }
                   } catch (err) {
-                    toast.error(err.response?.data?.message || 'Failed to upload profile picture', { id: uploadToast });
+                    toast.error('Failed to upload profile picture', { id: uploadToast });
                   }
                 }}
               />
